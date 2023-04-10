@@ -11,7 +11,7 @@ class GranthImporter
 
   class InvalidBookNameError < StandardError; end
 
-  def execute
+  def execute # rubocop:disable Metrics/CyclomaticComplexity
     @blob.each do |row|
       # ALL FIELDS
       book_name = row['Book_Name'].try(:strip)
