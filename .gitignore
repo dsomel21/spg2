@@ -29,3 +29,5 @@
 .DS_STORE
 
 lib/assets/*.csv
+
+node_modules
