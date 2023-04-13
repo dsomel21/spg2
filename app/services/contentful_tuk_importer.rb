@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ##
 # Note: We use Contentful to store our custom footnotes.
 # |                          | Rails Model                           | Content Type ID |
@@ -55,7 +57,7 @@ class ContentfulTukImporter
       @tuk = @pauri.tuks.find_by(:sequence => metadata[:tuk_number])
       @tuk.create_footnote!(:contentful_entry_id => e[:id])
     rescue ArgumentError => e
-      puts "❌ Error: #{e.message}"
+      Rails.logger.debug { "❌ Error: #{e.message}" }
     end
   end
 

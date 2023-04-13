@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ##
 # Note: We use Contentful to store our custom footnotes.
 # |                          | Rails Model                           | Content Type ID |
@@ -52,10 +54,10 @@ class ContentfulPauriImporter
       @book = Book.find_by(:sequence => metadata[:book_number])
       @chapter = @book.chapters.find_by(:number => metadata[:chapter_number])
       @pauri = @chapter.pauris.find_by(:number => metadata[:pauri_number])
-      puts "@pauri: #{@pauri.inspect}"
+      Rails.logger.debug { "@pauri: #{@pauri.inspect}" }
       @pauri.create_footnote!(:contentful_entry_id => e[:id])
     rescue ArgumentError => e
-      puts "❌ Error: #{e.message}"
+      Rails.logger.debug { "❌ Error: #{e.message}" }
     end
   end
 
