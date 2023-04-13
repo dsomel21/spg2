@@ -1,0 +1,2 @@
+class PauriFootnote < ApplicationRecord
+end

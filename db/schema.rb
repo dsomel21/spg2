@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_04_10_215505) do
+ActiveRecord::Schema[7.0].define(version: 2023_04_12_020637) do
   create_table "books", force: :cascade do |t|
     t.integer "sequence", null: false
     t.string "title", null: false
@@ -68,6 +68,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_10_215505) do
     t.index ["pauri_id"], name: "index_external_pauris_on_pauri_id"
   end
 
+  create_table "pauri_footnotes", force: :cascade do |t|
+    t.integer "pauri_id", null: false
+    t.text "bhai_vir_singh_footnote"
+    t.string "contentful_entry_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contentful_entry_id"], name: "index_pauri_footnotes_on_contentful_entry_id", unique: true
+    t.index ["pauri_id"], name: "index_pauri_footnotes_on_pauri_id"
+  end
+
   create_table "pauri_translations", force: :cascade do |t|
     t.string "en_translation"
     t.string "en_translator"
@@ -123,6 +133,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_10_215505) do
   add_foreign_key "chhands", "chapters"
   add_foreign_key "chhands", "chhand_types"
   add_foreign_key "external_pauris", "pauris"
+  add_foreign_key "pauri_footnotes", "pauris"
   add_foreign_key "pauri_translations", "pauris"
   add_foreign_key "pauris", "chapters"
   add_foreign_key "pauris", "chhands"
