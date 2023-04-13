@@ -7,4 +7,8 @@ class Chhand < ApplicationRecord
 
   validates :sequence, :presence => true
   validates :sequence, :uniqueness => { :scope => :chapter_id }
+
+  def self.READABLE_ATTRIBUTES
+    return [:id, :sequence, :vaak]
+  end
 end

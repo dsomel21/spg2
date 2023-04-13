@@ -20,4 +20,8 @@ class Tuk < ApplicationRecord
       .squeeze(' ') # Replace extra spaces with a single space
       .strip
   end
+
+  def self.READABLE_ATTRIBUTES
+    return [:id, :sequence, :content, :original_content]
+  end
 end
