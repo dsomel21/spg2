@@ -55,7 +55,9 @@ class ContentfulTukImporter
       @chapter = @book.chapters.find_by(:number => metadata[:chapter_number])
       @pauri = @chapter.pauris.find_by(:number => metadata[:pauri_number])
       @tuk = @pauri.tuks.find_by(:sequence => metadata[:tuk_number])
-      @tuk.create_footnote!(:contentful_entry_id => e[:id])
+      # Use existing `foonote`. If one already exists, overwrite it.
+      @tuk_footnote = @tuk.footnote || TukFootnote.new(:tuk => @tuk)
+      @tuk_footnote.update(:contentful_entry_id => e[:id])
     rescue ArgumentError => e
       Rails.logger.debug { "❌ Error: #{e.message}" }
     end

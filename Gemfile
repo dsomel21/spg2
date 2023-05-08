@@ -78,3 +78,4 @@ group :test do
 end
 
 gem 'contentful'
+gem 'tty-prompt'

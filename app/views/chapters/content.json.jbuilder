@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
+json.key_format! :camelize => :lower
+
 json.chapter do
   # :chapter => {:id, :number, :title, :en_title, :en_short_summary, :en_short_summary, :artwork_url}
   json.call(@chapter, *Chapter.READABLE_ATTRIBUTES)
+
+  json.book(@chapter.book, *Book.READABLE_ATTRIBUTES)
 
   # Samapti
 

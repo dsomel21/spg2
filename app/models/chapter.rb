@@ -7,6 +7,6 @@ class Chapter < ApplicationRecord
   has_many :tuks, :dependent => :destroy
 
   def self.READABLE_ATTRIBUTES
-    return [:id, :number, :title, :en_title, :en_short_summary, :en_short_summary, :artwork_url]
+    return [:id, :number, :title, :en_title, :en_long_summary, :en_short_summary, :artwork_url]
   end
 end
