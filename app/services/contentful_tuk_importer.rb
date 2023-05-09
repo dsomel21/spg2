@@ -1,21 +1,3 @@
-# frozen_string_literal: true
-
-##
-# Note: We use Contentful to store our custom footnotes.
-# |                          | Rails Model                           | Content Type ID |
-# |--------------------------|---------------------------------------|-----------------|
-# | Custom `pauri` footnotes | `PauriFootnote`.`contentful_entry_id` | `pauriFootnote` |
-# | Custom `tuk` footnotes   | `TukFootnote`.`contentful_entry_id`   | Nothing yet     |
-#
-# Contentful `pauriFootnote.fields:`
-# - `entryName`
-# - `vidhiyaSaagarContent`
-# - `vidhiyaSaagarMedia`
-# - `kamalpreetSinghContent`
-# - `kamalpreetSinghMedia`
-# - `manglacharanContent`
-# - `manglacharanMedia`
-##
 class ContentfulTukImporter
   def initialize
     @client = Contentful::Client.new(
@@ -26,19 +8,28 @@ class ContentfulTukImporter
     )
   end
 
-  # Retrieves `tukFootnote` entries from Contentful CMS and returns them as an array of Hashes.
-  # @returns [Array<Hash>] An array of JSON objects with keys `:id` and `:entry_name` for each tuk footnote.
-  # @example
-  #   Returns an array of JSON objects like this:
-  #   [{id: "6fy52qIYDK8EyisyaaBe4o", entry_name: "Book 1 Chapter 1 Tuk 13.2"}, {...}, {...}]
-  #   @entries = ContentfulTukImporter.new.entries
+  # Retrieves all `tukFootnote` entries from Contentful CMS and returns them as an array of Hashes.
   def entries
-    return @client.entries(:content_type => 'tukFootnote').map { |e| { :id => e.id, :entry_name => e.entry_name } }
+    all_entries = []
+    limit = 1000
+    skip = 0
+    total = 1
+
+    while all_entries.size < total
+      response = @client.entries(:content_type => 'tukFootnote', :limit => limit, :skip => skip)
+      total = response.total
+      all_entries += response.items.map { |e| { :id => e.id, :entry_name => e.entry_name } }
+      skip += limit
+    end
+
+    return all_entries
   end
 
   # ContentfulTukImporter.new.latest_entries
   def latest_entries
     @entries = self.entries
+    puts "@entries.count --- #{@entries.count}"
+    puts "@entries --- #{@entries}"
 
     # Only import `contentful_entry_id` if it doesn't exist already.
     existing_ids = TukFootnote.pluck(:contentful_entry_id)
@@ -55,9 +46,13 @@ class ContentfulTukImporter
       @chapter = @book.chapters.find_by(:number => metadata[:chapter_number])
       @pauri = @chapter.pauris.find_by(:number => metadata[:pauri_number])
       @tuk = @pauri.tuks.find_by(:sequence => metadata[:tuk_number])
-      # Use existing `foonote`. If one already exists, overwrite it.
-      @tuk_footnote = @tuk.footnote || TukFootnote.new(:tuk => @tuk)
-      @tuk_footnote.update(:contentful_entry_id => e[:id])
+      if @tuk
+        # Use existing `footnote`. If one already exists, overwrite it.
+        @tuk_footnote = @tuk.footnote || TukFootnote.new(:tuk => @tuk)
+        @tuk_footnote.update(:contentful_entry_id => e[:id])
+      else
+        puts "❌ Error: Tuk with book_number: #{metadata[:book_number]}, chapter_number: #{metadata[:chapter_number]}, pauri_number: #{metadata[:pauri_number]}, tuk_number: #{metadata[:tuk_number]} was not found"
+      end
     rescue ArgumentError => e
       Rails.logger.debug { "❌ Error: #{e.message}" }
     end
