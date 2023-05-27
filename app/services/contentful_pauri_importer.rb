@@ -5,16 +5,37 @@
 # |                          | Rails Model                           | Content Type ID |
 # |--------------------------|---------------------------------------|-----------------|
 # | Custom `pauri` footnotes | `PauriFootnote`.`contentful_entry_id` | `pauriFootnote` |
-# | Custom `tuk` footnotes   | `TukFootnote`.`contentful_entry_id`   | Nothing yet     |
+# | Custom `tuk` footnotes   | `TukFootnote`.`contentful_entry_id`   | `tukFootnote`   |
 #
-# Contentful `pauriFootnote.fields:`
+# Contentful `fields` for BOTH `pauriFootnote` and `tukFootnote`:
+# - `contentful_entry_id`
 # - `entryName`
 # - `vidhiyaSaagarContent`
+# - `isATranslationOfBhaiVirSingh`
 # - `vidhiyaSaagarMedia`
 # - `kamalpreetSinghContent`
 # - `kamalpreetSinghMedia`
 # - `manglacharanContent`
 # - `manglacharanMedia`
+#
+# == Creating and Importing PauriFootnotes
+# This is the process to create a footnote for a `pauri` in our Contentful account and import it into the Rails application:
+#
+# 1. A footnote editor logs into our Contentful account.
+# 2. The editor decides to create a footnote for the first `pauri` in Nanak Prakash 1 (`Book` with `:id => 1`), for chapter `:number => 42`.
+# 3. The editor creates a new `pauriFootnote` entry in Contentful. The naming convention for this entry should be `Book 1 Chapter 42 Pauri 1`.
+# 4. The editor adds relevant content to the footnote in the entry, then saves and publishes the entry.
+#
+# === Importing the Footnote
+# 5. When we execute `ContentfulPauriImporter.new.import_latest_entries`:
+#    - If there was no `pauri.footnote`, this will create a new `PauriFootnote` association
+#    - This footnote contains a `contentful_entry_id` attribute.
+#    - This `contentful_entry_id` attribute references the exact `pauriFootnote` entry that was created in Contentful.
+#
+# === Ensuring Idempotency
+# The `import_latest_entries` method can be run multiple times without any adverse effects, as it only imports new entries from Contentful.
+# This means if an entry is updated in Contentful, no additional steps are required.
+#
 ##
 class ContentfulPauriImporter
   def initialize
