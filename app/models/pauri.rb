@@ -7,8 +7,9 @@ class Pauri < ApplicationRecord
   has_one :footnote, :class_name => 'PauriFootnote', :dependent => :destroy
   has_one :external_pauri, :dependent => :destroy
   has_many :tuks, :dependent => :destroy
+  has_one :footnote, :class_name => 'PauriFootnote', :dependent => :destroy
 
-  def self.READABLE_ATTRIBUTES
-    return [:id, :number]
-  end
+  validates :number, :uniqueness => { :scope => :chapter_id }
+  validates :number, :presence => true
+  validates :number, :numericality => { :greater_than => 0 }
 end
